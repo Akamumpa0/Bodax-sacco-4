@@ -1,0 +1,45 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../components/Button.jsx';
+import FormField from '../../components/FormField.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+
+export default function Login() {
+  const [identifier, setIdentifier] = useState('treasurer@bodax.test');
+  const [password, setPassword] = useState('password123');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  async function submit(event) {
+    event.preventDefault();
+    setLoading(true);
+      setError('');
+    try {
+      await login(identifier, password);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="login-screen">
+      <form className="login-card" onSubmit={submit}>
+        <div>
+          <strong>Bodax SACCO</strong>
+          <span>Mbarara Boda Boda savings and loans</span>
+        </div>
+        {error && <p className="alert">{error}</p>}
+        <FormField label="Phone number or email" value={identifier} onChange={(event) => setIdentifier(event.target.value)} />
+        <FormField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Signing in...' : 'Sign in'}
+        </Button>
+      </form>
+    </main>
+  );
+}
