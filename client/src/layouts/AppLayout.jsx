@@ -16,6 +16,7 @@ const nav = {
     ['/treasurer/confirm-deposits', 'Confirm deposits', WalletCards],
     ['/treasurer/confirm-loans', 'Confirm loans', CreditCard],
     ['/treasurer/loans', 'Loans', CreditCard],
+    ['/treasurer/withdrawals', 'Withdrawals', WalletCards],
     ['/treasurer/reports', 'Reports', BarChart3],
   ],
   CHAIRMAN: [

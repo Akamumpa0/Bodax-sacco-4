@@ -738,3 +738,474 @@ tr:last-child td {
   }
 }
 
+/* ─── Confirmation Modal ──────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 9000;
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  width: min(480px, 100%);
+  box-shadow: var(--shadow-xl);
+  display: grid;
+  gap: 20px;
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-details {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.modal-detail-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.modal-detail-row dt {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.modal-detail-row dd {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.modal-warning {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Outline button variant for modal cancel */
+.btn-outline {
+  color: #475569;
+  background: transparent;
+  border: 1.5px solid var(--line);
+}
+
+.btn-outline:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* ─── Loading Spinner ─────────────────────────────────────────────────── */
+.spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px;
+  color: var(--muted);
+}
+
+.spinner-sm {
+  flex-direction: row;
+  padding: 12px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--primary-border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner-sm .spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ─── Error State ─────────────────────────────────────────────────────── */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.error-state-icon {
+  font-size: 2rem;
+}
+
+.error-state p {
+  margin: 0;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* ─── Member Header Banner ────────────────────────────────────────────── */
+.member-header-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: #ffffff;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.member-header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.member-header-info strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.member-header-info span {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+/* ─── Profile Header Section ──────────────────────────────────────────── */
+.profile-header {
+  background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.profile-header-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.profile-header-info strong {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.profile-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 6px;
+}
+
+.profile-meta-item {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.profile-meta-item strong {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* ─── Savings Receipt Screen ──────────────────────────────────────────── */
+.receipt-screen {
+  background: #ffffff;
+  border: 2px solid var(--primary-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  display: grid;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.receipt-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.receipt-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #065f46;
+  margin: 0;
+}
+
+.receipt-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-hover);
+  letter-spacing: -0.02em;
+  margin: 4px 0;
+}
+
+.receipt-details {
+  border-top: 1px dashed var(--line);
+  border-bottom: 1px dashed var(--line);
+  padding: 16px 0;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.receipt-row dt {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.receipt-row dd {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.receipt-footer {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.receipt-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ─── Loan Side-by-Side Review Layout ────────────────────────────────── */
+.loan-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.loan-review-card {
+  background: var(--primary-light);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
+.loan-review-card dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.loan-review-card dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* ─── Overdue Loans Panel ─────────────────────────────────────────────── */
+.overdue-list {
+  display: grid;
+  gap: 10px;
+}
+
+.overdue-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--danger-light);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--danger);
+}
+
+.overdue-item-info strong {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.overdue-item-info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.overdue-item-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.overdue-item-amount strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--danger);
+}
+
+.overdue-item-amount span {
+  font-size: 0.75rem;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+/* ─── Hint text (login) ───────────────────────────────────────────────── */
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: -4px;
+}
+
+/* ─── Mobile Statement Cards (<480px) ────────────────────────────────── */
+@media (max-width: 480px) {
+  .stmt-table-wrap {
+    display: none;
+  }
+
+  .stmt-cards {
+    display: grid;
+    gap: 10px;
+  }
+}
+
+@media (min-width: 481px) {
+  .stmt-cards {
+    display: none;
+  }
+
+  .stmt-table-wrap {
+    display: block;
+  }
+}
+
+.stmt-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: grid;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stmt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stmt-card-type {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1e293b;
+  text-transform: capitalize;
+}
+
+.stmt-card-amount {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--primary-hover);
+}
+
+.stmt-card-date {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ─── Login hint text ─────────────────────────────────────────────────── */
+.login-hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: -10px 0 0 0;
+  font-style: italic;
+}

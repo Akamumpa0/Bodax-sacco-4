@@ -4,8 +4,14 @@ import DataTable from '../../components/DataTable.jsx';
 import FormField from '../../components/FormField.jsx';
 import { Panel } from '../../components/Card.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
+import LoadingSpinner, { ErrorState } from '../../components/LoadingSpinner.jsx';
 import api from '../../api/client.js';
 import { money, shortDate } from '../../utils/format.js';
+
+/** Strip commas and return numeric string */
+function stripCommas(value) {
+  return String(value).replace(/,/g, '');
+}
 
 export default function MemberLoans() {
   const [loans, setLoans] = useState([]);
@@ -14,16 +20,26 @@ export default function MemberLoans() {
   const [form, setForm] = useState({ requested_amount: '', purpose: '', installment_count: 4, due_date: '' });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
 
   async function load() {
-    const [loanResult, requestResult, eligibilityResult] = await Promise.all([
-      api.get('/loans'),
-      api.get('/loans/requests'),
-      api.get('/loans/eligibility'),
-    ]);
-    setLoans(loanResult.data);
-    setRequests(requestResult.data);
-    setEligibility(eligibilityResult.data);
+    setLoading(true);
+    setFetchError('');
+    try {
+      const [loanResult, requestResult, eligibilityResult] = await Promise.all([
+        api.get('/loans'),
+        api.get('/loans/requests'),
+        api.get('/loans/eligibility'),
+      ]);
+      setLoans(loanResult.data);
+      setRequests(requestResult.data);
+      setEligibility(eligibilityResult.data);
+    } catch (err) {
+      setFetchError('Failed to load loan data. Please retry.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -31,12 +47,13 @@ export default function MemberLoans() {
   }, []);
 
   async function checkAmount(amount) {
-    if (!amount) {
+    const clean = stripCommas(amount);
+    if (!clean) {
       const { data } = await api.get('/loans/eligibility');
       setEligibility(data);
       return;
     }
-    const { data } = await api.get(`/loans/eligibility?amount=${amount}`);
+    const { data } = await api.get(`/loans/eligibility?amount=${clean}`);
     setEligibility(data);
   }
 
@@ -44,8 +61,17 @@ export default function MemberLoans() {
     event.preventDefault();
     setMessage('');
     setError('');
+    const cleanAmount = stripCommas(form.requested_amount);
+    if (!cleanAmount || isNaN(Number(cleanAmount))) {
+      setError('Enter a valid loan amount, e.g. 500000 or 500,000.');
+      return;
+    }
+    if (!form.due_date) {
+      setError('Select a repayment due date to continue.');
+      return;
+    }
     try {
-      const { data } = await api.post('/loans/requests', form);
+      const { data } = await api.post('/loans/requests', { ...form, requested_amount: cleanAmount });
       setMessage(
         data.eligibility.eligible
           ? 'Loan request submitted. Awaiting treasurer confirmation.'
@@ -54,9 +80,12 @@ export default function MemberLoans() {
       setForm({ requested_amount: '', purpose: '', installment_count: 4, due_date: '' });
       load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit loan request');
+      setError(err.response?.data?.message || 'Failed to submit loan request. Please try again.');
     }
   }
+
+  if (loading) return <div className="page-stack"><h1>Loans</h1><LoadingSpinner text="Loading loan data..." /></div>;
+  if (fetchError) return <div className="page-stack"><h1>Loans</h1><ErrorState message={fetchError} onRetry={load} /></div>;
 
   return (
     <div className="page-stack">
@@ -81,12 +110,14 @@ export default function MemberLoans() {
         <form className="form-grid" onSubmit={submit}>
           <FormField
             label="Amount (UGX)"
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={form.requested_amount}
             onChange={(e) => {
               setForm({ ...form, requested_amount: e.target.value });
               checkAmount(e.target.value);
             }}
+            placeholder="e.g. 500,000"
             required
           />
           <FormField
@@ -95,7 +126,7 @@ export default function MemberLoans() {
             onChange={(e) => setForm({ ...form, purpose: e.target.value })}
           />
           <FormField
-            label="Installments"
+            label="Number of payments"
             type="number"
             value={form.installment_count}
             onChange={(e) => setForm({ ...form, installment_count: e.target.value })}
@@ -129,9 +160,9 @@ export default function MemberLoans() {
         <DataTable
           rows={loans}
           columns={[
-            { key: 'principal', label: 'Loan amount', render: (row) => money(row.principal) },
+            { key: 'principal', label: 'Amount borrowed', render: (row) => money(row.principal) },
             { key: 'remaining_balance', label: 'Balance', render: (row) => money(row.remaining_balance) },
-            { key: 'installment_amount', label: 'Next installment', render: (row) => money(row.installment_amount) },
+            { key: 'installment_amount', label: 'Next payment', render: (row) => money(row.installment_amount) },
             { key: 'due_date', label: 'Due', render: (row) => shortDate(row.due_date) },
             { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
           ]}

@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react';
 import DataTable from '../../components/DataTable.jsx';
 import { Panel, StatCard } from '../../components/Card.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
+import LoadingSpinner, { ErrorState } from '../../components/LoadingSpinner.jsx';
 import { money, shortDate } from '../../utils/format.js';
 import api from '../../api/client.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function MemberDashboard() {
+  const { user } = useAuth();
   const [data, setData] = useState({});
   const [statement, setStatement] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [previousSavings, setPreviousSavings] = useState(null);
   const [showNotification, setShowNotification] = useState(false);
@@ -19,6 +23,7 @@ export default function MemberDashboard() {
   // Fetch all dashboard data
   async function fetchDashboardData() {
     try {
+      setError('');
       // Fetch main dashboard stats
       const { data: dashboardData } = await api.get('/reports/dashboard/member');
       
@@ -57,8 +62,9 @@ export default function MemberDashboard() {
       
       setLastUpdated(new Date());
       setLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err);
+      setError('Failed to load dashboard data.');
       setLoading(false);
     }
   }
@@ -66,8 +72,7 @@ export default function MemberDashboard() {
   // Initial load and auto-refresh every 5 seconds
   useEffect(() => {
     fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 5000); // Refresh every 5 seconds
-    
+    const interval = setInterval(fetchDashboardData, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -87,14 +92,36 @@ export default function MemberDashboard() {
     return (
       <div className="page-stack">
         <h1>Member Dashboard</h1>
-        <p>Loading...</p>
+        <LoadingSpinner text="Loading your dashboard..." />
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="page-stack">
+        <h1>Member Dashboard</h1>
+        <ErrorState message={error} onRetry={() => { setLoading(true); fetchDashboardData(); }} />
+      </div>
+    );
+  }
+
+  const initials = user?.full_name
+    ? user.full_name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
+
   return (
     <div className="page-stack">
       <h1>Member Dashboard</h1>
+
+      {/* ── Member identity banner – visible immediately, no scroll ── */}
+      <div className="member-header-banner" aria-label="Member information">
+        <div className="member-header-avatar">{initials}</div>
+        <div className="member-header-info">
+          <strong>{user?.full_name || '—'}</strong>
+          <span>Member No: {user?.member_number || '—'}</span>
+        </div>
+      </div>
       
       {/* Overdue loan reminder popup */}
       {overdueReminder && (
@@ -221,7 +248,7 @@ export default function MemberDashboard() {
           <DataTable
             rows={data.pending_loans}
             columns={[
-              { key: 'principal', label: 'Amount', render: (row) => money(row.principal) },
+              { key: 'principal', label: 'Amount borrowed', render: (row) => money(row.principal) },
               { key: 'remaining_balance', label: 'Remaining', render: (row) => money(row.remaining_balance) },
               { key: 'installment_amount', label: 'Installment', render: (row) => money(row.installment_amount) },
               { key: 'due_date', label: 'Due date', render: (row) => shortDate(row.due_date) },
